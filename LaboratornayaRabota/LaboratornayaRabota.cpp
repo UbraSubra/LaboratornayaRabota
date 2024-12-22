@@ -39,3 +39,12 @@ struct Pipe {
     void load(ifstream& in) {
         in >> name >> length >> diameter >> inRepair;
     }
+};
+
+struct CompressorStation {
+    string name;
+    int totalWorkShops;
+    int workingWorkShops;
+    double efficiency;
+
+    
