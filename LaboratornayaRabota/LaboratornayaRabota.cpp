@@ -114,3 +114,26 @@ int main() {
         int choice;
         cin >> choice;
 
+        if (choice == 1) {
+            Pipe pipe;
+            pipe.read();
+            pipes.push_back(pipe);
+        }
+
+        else if (choice == 2) {
+            CompressorStation cs;
+            cs.read();
+            stations.push_back(cs);
+        }
+
+        else if (choice == 3) {
+            cout << "Список труб:" << endl;
+            for (const auto& pipe : pipes) {
+                pipe.display();
+            }
+            cout << "Список КС:" << endl;
+            for (const auto& cs : stations) {
+                cs.display();
+            }
+        }
+
