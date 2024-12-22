@@ -83,3 +83,12 @@ struct CompressorStation {
             cout << "Все цеха уже остановлены!" << endl;
         }
     }
+
+    void save(ofstream& out) const {
+        out << name << " " << totalWorkShops << " " << workingWorkShops << " " << efficiency << endl;
+    }
+
+    void load(ifstream& in) {
+        in >> name >> totalWorkShops >> workingWorkShops >> efficiency;
+    }
+};
