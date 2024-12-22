@@ -26,3 +26,8 @@ struct Pipe {
         cout << "Труба " << name << ", длина: " << length << " км, диаметр: "
             << diameter << " см, в ремонте: " << (inRepair ? "Да" : "Нет") << endl;
     }
+
+    void editRepairStatus() {
+        inRepair = !inRepair;
+        cout << "Статус 'в ремонте' обновлен на: " << (inRepair ? "Да" : "Нет") << endl;
+    }
