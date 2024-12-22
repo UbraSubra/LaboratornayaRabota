@@ -58,4 +58,8 @@ struct CompressorStation {
         cin >> efficiency;
     }
 
-    
+    void display() const {
+        cout << "КС " << name << ", всего цехов: " << totalShops
+            << ", работающих цехов: " << workingShops << ", эффективность: "
+            << efficiency << endl;
+    }
