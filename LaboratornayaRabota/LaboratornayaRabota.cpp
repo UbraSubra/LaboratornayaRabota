@@ -107,3 +107,10 @@ void printMenu() {
     cout << "7. Загрузить" << endl;
     cout << "0. Выход" << endl;
 }
+
+int main() {
+    while (true) {
+        printMenu();
+        int choice;
+        cin >> choice;
+
