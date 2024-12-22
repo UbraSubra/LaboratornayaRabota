@@ -4,8 +4,10 @@
 #include <fstream>
 #include <string>
 
-int main()
-{
-    std::cout << "Hello Mir\n";
-}
+using namespace std;
 
+struct Pipe {
+    string name;
+    double length;
+    double diameter;
+    bool inRepair;
