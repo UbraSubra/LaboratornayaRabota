@@ -105,7 +105,50 @@ void printMenu() {
     cout << "5. Редактировать КС" << endl;
     cout << "6. Сохранить" << endl;
     cout << "7. Загрузить" << endl;
+    cout << "8. Поиск труб" << endl;
+    cout << "9. Поиск КС" << endl;
     cout << "0. Выход" << endl;
+}
+
+void searchPipes() {
+    string nameFilter;
+    bool repairFilter;
+    cout << "Хотите фильтровать по статусу ремонта? (1 - да, 0 - нет): ";
+    cin >> repairFilter;
+
+    bool found = false;
+    for (const auto& pipe : pipes) {
+        if ((!nameFilter.empty() && pipe.name.find(nameFilter) != string::npos) ||
+            (repairFilter == pipe.inRepair)) {
+            pipe.display();
+            found = true;
+        }
+    }
+    if (!found) {
+        cout << "Трубы не найдены по заданному фильтру." << endl;
+    }
+}
+
+void searchStations() {
+    string nameFilter;
+    double efficiencyFilter;
+    cout << "Введите минимальный процент незадействованных цехов (от 0 до 100): ";
+    cin >> efficiencyFilter;
+
+    bool found = false;
+    for (const auto& cs : stations) {
+        double unusedWorkshops = cs.totalWorkShops - cs.workingWorkShops;
+        double unusedPercentage = (unusedWorkshops / cs.totalWorkShops) * 100;
+
+        if ((!nameFilter.empty() && cs.name.find(nameFilter) != string::npos) ||
+            (unusedPercentage >= efficiencyFilter)) {
+            cs.display();
+            found = true;
+        }
+    }
+    if (!found) {
+        cout << "КС не найдены по заданному фильтру." << endl;
+    }
 }
 
 int main() {
@@ -205,6 +248,14 @@ int main() {
             else {
                 cout << "Не удалось открыть файл!" << endl;
             }
+        }
+
+        else if (choice == 8) {
+            searchPipes();  // Вызов поиска труб
+        }
+
+        else if (choice == 9) {
+            searchStations();  // Вызов поиска КС
         }
 
         else if (choice == 0) {
