@@ -21,3 +21,8 @@ struct Pipe {
         cin >> diameter;
         inRepair = false; // По умолчанию не в ремонте
     }
+
+    void display() const {
+        cout << "Труба " << name << ", длина: " << length << " км, диаметр: "
+            << diameter << " см, в ремонте: " << (inRepair ? "Да" : "Нет") << endl;
+    }
