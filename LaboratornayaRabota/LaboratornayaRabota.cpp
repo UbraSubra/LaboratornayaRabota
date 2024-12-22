@@ -31,3 +31,7 @@ struct Pipe {
         inRepair = !inRepair;
         cout << "Статус 'в ремонте' обновлен на: " << (inRepair ? "Да" : "Нет") << endl;
     }
+
+    void save(ofstream& out) const {
+        out << name << " " << length << " " << diameter << " " << inRepair << endl;
+    }
