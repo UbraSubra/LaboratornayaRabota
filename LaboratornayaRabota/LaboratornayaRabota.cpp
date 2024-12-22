@@ -74,4 +74,12 @@ struct CompressorStation {
         }
     }
 
-
+    void stopWorkShop() {
+        if (workingWorkShops > 0) {
+            workingWorkShops--;
+            cout << "Цех остановлен. Теперь работающих цехов: " << workingWorkShops << endl;
+        }
+        else {
+            cout << "Все цеха уже остановлены!" << endl;
+        }
+    }
