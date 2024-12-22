@@ -92,3 +92,18 @@ struct CompressorStation {
         in >> name >> totalWorkShops >> workingWorkShops >> efficiency;
     }
 };
+
+vector<Pipe> pipes;
+vector<CompressorStation> stations;
+
+void printMenu() {
+    cout << "Выберите действие:" << endl;
+    cout << "1. Добавить трубу" << endl;
+    cout << "2. Добавить КС" << endl;
+    cout << "3. Просмотр всех объектов" << endl;
+    cout << "4. Редактировать трубу" << endl;
+    cout << "5. Редактировать КС" << endl;
+    cout << "6. Сохранить" << endl;
+    cout << "7. Загрузить" << endl;
+    cout << "0. Выход" << endl;
+}
