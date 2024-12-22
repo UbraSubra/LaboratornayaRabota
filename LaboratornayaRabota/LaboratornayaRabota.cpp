@@ -168,3 +168,40 @@ int main() {
                 cout << "Некорректный индекс!" << endl;
             }
         }
+
+        else if (choice == 6) {
+            ofstream out("data.txt");
+            for (const auto& pipe : pipes) {
+                pipe.save(out);
+            }
+            for (const auto& cs : stations) {
+                cs.save(out);
+            }
+            out.close();
+            cout << "Данные сохранены!" << endl;
+        }
+
+        else if (choice == 7) {
+            ifstream in("data.txt");
+            if (in.is_open()) {
+                pipes.clear();
+                stations.clear();
+
+                while (!in.eof()) {
+                    Pipe pipe;
+                    pipe.load(in);
+                    pipes.push_back(pipe);
+                }
+
+                while (!in.eof()) {
+                    CompressorStation cs;
+                    cs.load(in);
+                    stations.push_back(cs);
+                }
+                in.close();
+                cout << "Данные загружены!" << endl;
+            }
+            else {
+                cout << "Не удалось открыть файл!" << endl;
+            }
+        }
