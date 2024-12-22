@@ -102,13 +102,29 @@ void printMenu() {
     cout << "2. Добавить КС" << endl;
     cout << "3. Просмотр всех объектов" << endl;
     cout << "4. Редактировать трубу" << endl;
-    cout << "5. Редактировать КС" << endl;
-    cout << "6. Сохранить" << endl;
-    cout << "7. Загрузить" << endl;
-    cout << "8. Поиск труб" << endl;
-    cout << "9. Поиск КС" << endl;
+    cout << "5. Редактирование всех труб" << endl;
+    cout << "6. Редактировать КС" << endl;
+    cout << "7. Поиск труб" << endl;
+    cout << "8. Поиск КС" << endl;
+    cout << "9. Сохранить" << endl;
+    cout << "10. Загрузить" << endl;
     cout << "0. Выход" << endl;
 }
+
+void toggleAllPipesRepairStatus() {
+    if (pipes.empty()) {
+        cout << "Нет труб для редактирования." << endl;
+        return;
+    }
+
+    for (auto& pipe : pipes) {
+        pipe.inRepair = !pipe.inRepair;  // Переключаем состояние
+    }
+
+    cout << "Статус 'в ремонте' для всех труб был переключен на: "
+        << (pipes[0].inRepair ? "Да" : "Нет") << endl;  // Показываем новое состояние
+}
+
 
 void searchPipes() {
     string nameFilter;
@@ -193,7 +209,7 @@ int main() {
             }
         }
 
-        else if (choice == 5) {
+        else if (choice == 6) {
             int index;
             cout << "Введите индекс КС для редактирования (0 - " << stations.size() - 1 << "): ";
             cin >> index;
@@ -213,7 +229,7 @@ int main() {
             }
         }
 
-        else if (choice == 6) {
+        else if (choice == 9) {
             ofstream out("data.txt");
             for (const auto& pipe : pipes) {
                 pipe.save(out);
@@ -225,7 +241,7 @@ int main() {
             cout << "Данные сохранены!" << endl;
         }
 
-        else if (choice == 7) {
+        else if (choice == 10) {
             ifstream in("data.txt");
             if (in.is_open()) {
                 pipes.clear();
@@ -250,13 +266,18 @@ int main() {
             }
         }
 
-        else if (choice == 8) {
+        else if (choice == 7) {
             searchPipes();  // Вызов поиска труб
         }
 
-        else if (choice == 9) {
+        else if (choice == 8) {
             searchStations();  // Вызов поиска КС
         }
+
+        else if (choice == 5) {
+            toggleAllPipesRepairStatus();  // Переключаем статус для всех труб
+        }
+
 
         else if (choice == 0) {
             break;
