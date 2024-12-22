@@ -46,5 +46,16 @@ struct CompressorStation {
     int totalWorkShops;
     int workingWorkShops;
     double efficiency;
+    
+    void read() {
+        cout << "Ввод имени КС: ";
+        cin >> name;
+        cout << "Ввод количества цехов: ";
+        cin >> totalWorkShops;
+        cout << "Ввод количества работающих цехов: ";
+        cin >> workingWorkShops;
+        cout << "Ввод эффективности: ";
+        cin >> efficiency;
+    }
 
     
