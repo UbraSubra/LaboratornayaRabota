@@ -137,3 +137,34 @@ int main() {
             }
         }
 
+        else if (choice == 4) {
+            int index;
+            cout << "Введите индекс трубы для редактирования (0 - " << pipes.size() - 1 << "): ";
+            cin >> index;
+            if (index >= 0 && index < pipes.size()) {
+                pipes[index].editRepairStatus();
+            }
+            else {
+                cout << "Некорректный индекс!" << endl;
+            }
+        }
+
+        else if (choice == 5) {
+            int index;
+            cout << "Введите индекс КС для редактирования (0 - " << stations.size() - 1 << "): ";
+            cin >> index;
+            if (index >= 0 && index < stations.size()) {
+                int action;
+                cout << "1. Запустить цех\n2. Остановить цех\nВыберите действие: ";
+                cin >> action;
+                if (action == 1) {
+                    stations[index].startWorkShop();
+                }
+                else if (action == 2) {
+                    stations[index].stopWorkShop();
+                }
+            }
+            else {
+                cout << "Некорректный индекс!" << endl;
+            }
+        }
