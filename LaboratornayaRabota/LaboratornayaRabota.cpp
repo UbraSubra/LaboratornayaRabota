@@ -205,3 +205,13 @@ int main() {
                 cout << "Не удалось открыть файл!" << endl;
             }
         }
+
+        else if (choice == 0) {
+            break;
+        }
+        else {
+            cout << "Некорректный ввод, попробуйте снова." << endl;
+        }
+    }
+    return 0;
+}
