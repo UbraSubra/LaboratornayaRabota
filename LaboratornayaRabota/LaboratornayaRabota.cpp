@@ -59,7 +59,19 @@ struct CompressorStation {
     }
 
     void display() const {
-        cout << "КС " << name << ", всего цехов: " << totalShops
-            << ", работающих цехов: " << workingShops << ", эффективность: "
+        cout << "КС " << name << ", всего цехов: " << totalWorkShops
+            << ", работающих цехов: " << workingWorkShops << ", эффективность: "
             << efficiency << endl;
     }
+
+    void startWorkShop() {
+        if (workingWorkShops < totalWorkShops) {
+            workingWorkShops++;
+            cout << "Цех запущен. Теперь работающих цехов: " << workingWorkShops << endl;
+        }
+        else {
+            cout << "Все цеха уже работают!" << endl;
+        }
+    }
+
+
