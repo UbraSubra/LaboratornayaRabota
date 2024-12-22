@@ -35,3 +35,7 @@ struct Pipe {
     void save(ofstream& out) const {
         out << name << " " << length << " " << diameter << " " << inRepair << endl;
     }
+
+    void load(ifstream& in) {
+        in >> name >> length >> diameter >> inRepair;
+    }
