@@ -19,7 +19,7 @@ struct Pipe {
         cin >> length;
         cout << "Ввод диаметра трубы (в см): ";
         cin >> diameter;
-        inRepair = false; // По умолчанию не в ремонте
+        inRepair = false;
     }
 
     void display() const {
@@ -109,6 +109,7 @@ void printMenu() {
 }
 
 int main() {
+    setlocale(LC_ALL, "Russian");
     while (true) {
         printMenu();
         int choice;
