@@ -1,16 +1,24 @@
-﻿//LR1 Karpov-AA2307
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <fstream>
 #include <string>
+#include <queue>
+#include <map>
 
 using namespace std;
 
 struct Pipe {
+    static int id_counter;  // Статический счетчик ID для каждой трубы
+    int id;  // Уникальный идентификатор трубы
     string name;
     double length;
     double diameter;
     bool inRepair;
+
+    Pipe() {
+        id = id_counter++;  // Устанавливаем уникальный ID
+        inRepair = false;
+    }
 
     void read() {
         cout << "Ввод имени трубы: ";
@@ -23,7 +31,7 @@ struct Pipe {
     }
 
     void display() const {
-        cout << "Труба " << name << ", длина: " << length << " км, диаметр: "
+        cout << "Труба " << name << " (ID: " << id << "), длина: " << length << " км, диаметр: "
             << diameter << " см, в ремонте: " << (inRepair ? "Да" : "Нет") << endl;
     }
 
@@ -33,20 +41,28 @@ struct Pipe {
     }
 
     void save(ofstream& out) const {
-        out << name << " " << length << " " << diameter << " " << inRepair << endl;
+        out << id << " " << name << " " << length << " " << diameter << " " << inRepair << endl;
     }
 
     void load(ifstream& in) {
-        in >> name >> length >> diameter >> inRepair;
+        in >> id >> name >> length >> diameter >> inRepair;
     }
 };
 
+int Pipe::id_counter = 1; // Инициализация счетчика ID
+
 struct CompressorStation {
+    static int id_counter;  // Статический счетчик ID для каждой КС
+    int id;  // Уникальный идентификатор КС
     string name;
     int totalWorkShops;
     int workingWorkShops;
     double efficiency;
-    
+
+    CompressorStation() {
+        id = id_counter++;  // Устанавливаем уникальный ID
+    }
+
     void read() {
         cout << "Ввод имени КС: ";
         cin >> name;
@@ -59,42 +75,109 @@ struct CompressorStation {
     }
 
     void display() const {
-        cout << "КС " << name << ", всего цехов: " << totalWorkShops
+        cout << "КС " << name << " (ID: " << id << "), всего цехов: " << totalWorkShops
             << ", работающих цехов: " << workingWorkShops << ", эффективность: "
             << efficiency << endl;
     }
 
-    void startWorkShop() {
-        if (workingWorkShops < totalWorkShops) {
-            workingWorkShops++;
-            cout << "Цех запущен. Теперь работающих цехов: " << workingWorkShops << endl;
-        }
-        else {
-            cout << "Все цеха уже работают!" << endl;
-        }
-    }
-
-    void stopWorkShop() {
-        if (workingWorkShops > 0) {
-            workingWorkShops--;
-            cout << "Цех остановлен. Теперь работающих цехов: " << workingWorkShops << endl;
-        }
-        else {
-            cout << "Все цеха уже остановлены!" << endl;
-        }
-    }
-
     void save(ofstream& out) const {
-        out << name << " " << totalWorkShops << " " << workingWorkShops << " " << efficiency << endl;
+        out << id << " " << name << " " << totalWorkShops << " " << workingWorkShops << " " << efficiency << endl;
     }
 
     void load(ifstream& in) {
-        in >> name >> totalWorkShops >> workingWorkShops >> efficiency;
+        in >> id >> name >> totalWorkShops >> workingWorkShops >> efficiency;
+    }
+};
+
+int CompressorStation::id_counter = 1; // Инициализация счетчика ID для КС
+
+struct Connection {
+    int cs_in_id;
+    int cs_out_id;
+    int pipe_id;
+
+    Connection(int cs_in, int cs_out, int pipe)
+        : cs_in_id(cs_in), cs_out_id(cs_out), pipe_id(pipe) {
     }
 };
 
 vector<Pipe> pipes;
 vector<CompressorStation> stations;
+vector<Connection> connections;
+
+CompressorStation* findStationById(int id) {
+    for (auto& station : stations) {
+        if (station.id == id) {
+            return &station;  // Возвращаем указатель на найденную станцию
+        }
+    }
+    return nullptr;  // Если станция не найдена
+}
+
+Pipe* findPipeById(int id) {
+    for (auto& pipe : pipes) {
+        if (pipe.id == id) {
+            return &pipe;  // Возвращаем указатель на трубу
+        }
+    }
+    return nullptr;  // Если труба не найдена
+}
+
+Pipe* findPipeByDiameter(double diameter) {
+    for (auto& pipe : pipes) {
+        if (pipe.diameter == diameter && !pipe.inRepair) {
+            return &pipe;  // Возвращаем указатель на трубу, если она не в ремонте и найдено совпадение по диаметру
+        }
+    }
+    return nullptr;
+}
+
+Pipe createNewPipe(double diameter) {
+    Pipe newPipe;
+    newPipe.diameter = diameter;
+    cout << "Труба с диаметром " << diameter << " см не найдена, создается новая.\n";
+    newPipe.read();  // Ввод данных для новой трубы
+    pipes.push_back(newPipe);  // Добавляем в список труб
+    return newPipe;  // Возвращаем объект по значению
+}
+
+void connectStationsToPipe(int cs_in_id, int cs_out_id, double diameter) {
+    CompressorStation* cs_in = findStationById(cs_in_id);  // Ищем станцию по ID
+    CompressorStation* cs_out = findStationById(cs_out_id);  // Ищем станцию по ID
+
+    if (!cs_in || !cs_out) {
+        cout << "Ошибка: Одна из станций с указанным ID не найдена.\n";
+        return;  // Прерываем выполнение, если станция не найдена
+    }
+
+    Pipe* pipe = findPipeByDiameter(diameter);  // Ищем трубу по диаметру
+    if (pipe == nullptr) {
+        Pipe newPipe = createNewPipe(diameter);  // Создаем новый объект трубы
+        pipe = &pipes.back();  // Используем последний добавленный объект
+    }
+
+    connections.push_back(Connection(cs_in->id, cs_out->id, pipe->id));  // Добавляем соединение
+    cout << "Соединение КС " << cs_in->name << " с КС " << cs_out->name
+        << " трубой с ID " << pipe->id << " установлено.\n";
+}
+
+void displayConnections() {
+    cout << "Список соединений:\n";
+    for (const auto& conn : connections) {
+        CompressorStation* cs_in = findStationById(conn.cs_in_id);
+        CompressorStation* cs_out = findStationById(conn.cs_out_id);
+        Pipe* pipe = findPipeById(conn.pipe_id);
+
+        if (cs_in && cs_out && pipe) {
+            cout << "КС " << cs_in->name << " (ID: " << cs_in->id << ") --> "
+                << "КС " << cs_out->name << " (ID: " << cs_out->id << ") через трубу "
+                << pipe->name << " (ID: " << pipe->id << ", диаметр: " << pipe->diameter << " см)" << endl;
+        }
+        else {
+            cout << "Ошибка: Неверное соединение (ID: " << conn.cs_in_id << " -> " << conn.cs_out_id << ").\n";
+        }
+    }
+}
 
 void printMenu() {
     cout << "Выберите действие:" << endl;
@@ -102,69 +185,8 @@ void printMenu() {
     cout << "2. Добавить КС" << endl;
     cout << "3. Просмотр всех объектов" << endl;
     cout << "4. Редактировать трубу" << endl;
-    cout << "5. Редактирование всех труб" << endl;
-    cout << "6. Редактировать КС" << endl;
-    cout << "7. Поиск труб" << endl;
-    cout << "8. Поиск КС" << endl;
-    cout << "9. Сохранить" << endl;
-    cout << "10. Загрузить" << endl;
-    cout << "0. Выход" << endl;
-}
-
-void toggleAllPipesRepairStatus() {
-    if (pipes.empty()) {
-        cout << "Нет труб для редактирования." << endl;
-        return;
-    }
-
-    for (auto& pipe : pipes) {
-        pipe.inRepair = !pipe.inRepair;  // Переключаем состояние
-    }
-
-    cout << "Статус 'в ремонте' для всех труб был переключен на: "
-        << (pipes[0].inRepair ? "Да" : "Нет") << endl;  // Показываем новое состояние
-}
-
-
-void searchPipes() {
-    string nameFilter;
-    bool repairFilter;
-    cout << "Хотите фильтровать по статусу ремонта? (1 - да, 0 - нет): ";
-    cin >> repairFilter;
-
-    bool found = false;
-    for (const auto& pipe : pipes) {
-        if ((!nameFilter.empty() && pipe.name.find(nameFilter) != string::npos) ||
-            (repairFilter == pipe.inRepair)) {
-            pipe.display();
-            found = true;
-        }
-    }
-    if (!found) {
-        cout << "Трубы не найдены по заданному фильтру." << endl;
-    }
-}
-
-void searchStations() {
-    string nameFilter;
-    double efficiencyFilter;
-    cout << "Введите минимальный процент незадействованных цехов (от 0 до 100): ";
-    cin >> efficiencyFilter;
-
-    bool found = false;
-    for (const auto& cs : stations) {
-        double unusedWorkshops = cs.totalWorkShops - cs.workingWorkShops;
-        double unusedPercentage = (unusedWorkshops / cs.totalWorkShops) * 100;
-
-        if ((!nameFilter.empty() && cs.name.find(nameFilter) != string::npos) ||
-            (unusedPercentage >= efficiencyFilter)) {
-            cs.display();
-            found = true;
-        }
-    }
-    if (!found) {
-        cout << "КС не найдены по заданному фильтру." << endl;
-    }
+    cout << "5. Соединить КС трубой" << endl;
+    cout << "6. Выход" << endl;
 }
 
 int main() {
@@ -179,107 +201,50 @@ int main() {
             pipe.read();
             pipes.push_back(pipe);
         }
-
         else if (choice == 2) {
             CompressorStation cs;
             cs.read();
             stations.push_back(cs);
         }
-
         else if (choice == 3) {
-            cout << "Список труб:" << endl;
+            cout << "Список труб:\n";
             for (const auto& pipe : pipes) {
                 pipe.display();
             }
-            cout << "Список КС:" << endl;
+
+            cout << "\nСписок КС:\n";
             for (const auto& cs : stations) {
                 cs.display();
             }
-        }
 
+            cout << "\nСписок соединений:\n";
+            displayConnections();
+        }
         else if (choice == 4) {
-            int index;
-            cout << "Введите индекс трубы для редактирования (0 - " << pipes.size() - 1 << "): ";
-            cin >> index;
-            if (index >= 0 && index < pipes.size()) {
-                pipes[index].editRepairStatus();
-            }
-            else {
-                cout << "Некорректный индекс!" << endl;
-            }
-        }
+            int pipe_id;
+            cout << "Введите ID трубы для редактирования: ";
+            cin >> pipe_id;
 
-        else if (choice == 6) {
-            int index;
-            cout << "Введите индекс КС для редактирования (0 - " << stations.size() - 1 << "): ";
-            cin >> index;
-            if (index >= 0 && index < stations.size()) {
-                int action;
-                cout << "1. Запустить цех\n2. Остановить цех\nВыберите действие: ";
-                cin >> action;
-                if (action == 1) {
-                    stations[index].startWorkShop();
-                }
-                else if (action == 2) {
-                    stations[index].stopWorkShop();
+            for (auto& pipe : pipes) {
+                if (pipe.id == pipe_id) {
+                    pipe.editRepairStatus();
+                    break;
                 }
             }
-            else {
-                cout << "Некорректный индекс!" << endl;
-            }
         }
-
-        else if (choice == 9) {
-            ofstream out("data.txt");
-            for (const auto& pipe : pipes) {
-                pipe.save(out);
-            }
-            for (const auto& cs : stations) {
-                cs.save(out);
-            }
-            out.close();
-            cout << "Данные сохранены!" << endl;
-        }
-
-        else if (choice == 10) {
-            ifstream in("data.txt");
-            if (in.is_open()) {
-                pipes.clear();
-                stations.clear();
-
-                while (!in.eof()) {
-                    Pipe pipe;
-                    pipe.load(in);
-                    pipes.push_back(pipe);
-                }
-
-                while (!in.eof()) {
-                    CompressorStation cs;
-                    cs.load(in);
-                    stations.push_back(cs);
-                }
-                in.close();
-                cout << "Данные загружены!" << endl;
-            }
-            else {
-                cout << "Не удалось открыть файл!" << endl;
-            }
-        }
-
-        else if (choice == 7) {
-            searchPipes();  // Вызов поиска труб
-        }
-
-        else if (choice == 8) {
-            searchStations();  // Вызов поиска КС
-        }
-
         else if (choice == 5) {
-            toggleAllPipesRepairStatus();  // Переключаем статус для всех труб
+            int cs_in_id, cs_out_id;
+            double diameter;
+            cout << "Введите ID КС для входа: ";
+            cin >> cs_in_id;
+            cout << "Введите ID КС для выхода: ";
+            cin >> cs_out_id;
+            cout << "Введите диаметр трубы: ";
+            cin >> diameter;
+
+            connectStationsToPipe(cs_in_id, cs_out_id, diameter);
         }
-
-
-        else if (choice == 0) {
+        else if (choice == 6) {
             break;
         }
         else {
